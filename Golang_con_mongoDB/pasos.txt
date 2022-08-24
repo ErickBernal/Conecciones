@@ -1,0 +1,25 @@
+#para descargar todo lo necesario 
+go mod tidy
+
+#crear el archivo main.go
+touch main.go 
+
+go mod init main.go
+
+go mod tidy 
+
+go get github.com/gorilla/mux
+    # salida
+    # go: added github.com/gorilla/mux v1.8.0
+
+go get go.mongodb.org/mongo-driver
+    #   salida
+    #   go: added go.mongodb.org/mongo-driver v1.10.1
+
+go run main.go
+
+#Al ejecutar, pueden aparecer unos errores, que indican dependencias necesarias para ejecutar 
+    go get go.mongodb.org/mongo-driver/x/mongo/driver@v1.10.1
+    go get go.mongodb.org/mongo-driver/x/mongo/driver/topology@v1.10.1
+    go get go.mongodb.org/mongo-driver/mongo@v1.10.1
+
