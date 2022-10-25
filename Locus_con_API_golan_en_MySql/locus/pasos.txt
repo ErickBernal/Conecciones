@@ -1,0 +1,11 @@
+#verificar python
+    pip --version
+    python3 --version
+
+#instalar locust
+    pip install locust
+#comprobar version
+    locust -V
+
+#ejecutar locust
+    locust -f trafic.py

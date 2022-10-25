@@ -1,0 +1,3 @@
+en la cada carpeta existe un archivos "pasos" "seguir las recomendaciones"
+# levantar ambas aplicaciones para comprobar su funcionamiento
+
