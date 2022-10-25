@@ -14,6 +14,17 @@ import (
 //go get github.com/gorilla/mux
 
 var conn = MySQLConn()
+var cont = 0
+
+// #coneccion con "dbaver"
+// 	#entrar a conectar
+// 	#seleccionar mysql
+// 	#ingresar los datos
+// 		server host: localhost
+// 		port: 3306
+// 		nombre de usuario: root
+// 		contrase;a: 1234
+// 	#probar coneccion
 
 func MySQLConn() *sql.DB {
 	//connString := "root:password@tcp(34.135.81.94:3306)/pro1_bases1"
@@ -34,7 +45,14 @@ type User struct {
 	Carnet int    `json:"carnet"`
 }
 
+// get  ---------------------------------------------------------------------
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
 func getUser(response http.ResponseWriter, request *http.Request) {
+	enableCors(&response)
+
 	response.Header().Add("content-type", "application/json")
 	var listUsr []User
 	query := "SELECT * FROM prueba;"
@@ -53,10 +71,14 @@ func getUser(response http.ResponseWriter, request *http.Request) {
 	json.NewEncoder(response).Encode(listUsr)
 }
 
+// post  ---------------------------------------------------------------------
 func postUser(response http.ResponseWriter, request *http.Request) {
 	response.Header().Add("content-type", "application/json")
+	enableCors(&response)
 	var usr User
-	json.NewDecoder((request.Body)).Decode(&usr)
+	json.NewDecoder(request.Body).Decode(&usr)
+	cont = cont + 1
+	fmt.Println(cont, "(name:", usr.Name, " carnet:", usr.Carnet, ")")
 	query := `INSERT INTO prueba(name, carnet) VALUES (?,?);`
 	result, err := conn.Exec(query, usr.Name, usr.Carnet)
 	if err != nil {
@@ -65,11 +87,27 @@ func postUser(response http.ResponseWriter, request *http.Request) {
 	json.NewEncoder(response).Encode(result)
 }
 
+// quitando los cors
+func optPostCors(toAnsw *http.ResponseWriter) {
+	(*toAnsw).Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	(*toAnsw).Header().Set("Access-Control-Allow-Methods", "POST")
+	(*toAnsw).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
+func postUser_options(response http.ResponseWriter, request *http.Request) { // POST
+	response.Header().Add("content-type", "application/json") //aceptar json en el request
+	optPostCors(&response)
+	json.NewEncoder(response).Encode("<repuesta POST>")
+}
+
 //*******************     main 		**********************************
 
 func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/postUser", postUser).Methods("POST")
+	router.HandleFunc("/postUser", postUser_options).Methods("OPTIONS")
+
+	//http://localhost:8000/getUsers
 	router.HandleFunc("/getUsers", getUser).Methods("GET")
 
 	fmt.Println("Server on port", 8000)
